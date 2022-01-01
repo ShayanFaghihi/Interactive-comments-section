@@ -51,7 +51,7 @@ img {
 
 /* Main Container */
 .container {
-    width: min(90%,600px);
+    width: min(90%,650px);
     margin: 2rem auto;
 }
 
@@ -126,8 +126,8 @@ textarea:focus {
         flex-basis: 5%;
     }
 
-    .comment-box.large>div:nth-of-type(3) {
-        align-self: center;
+    .comment-box.large>div:nth-of-type(1) {
+        align-self: flex-start;
     }
     
     .comment-box.large>div:nth-of-type(3) {
@@ -217,8 +217,27 @@ textarea:focus {
     border-radius: var(--default-border-radius);
 }
 
+.self-comment .comment-box__user .comment-box__interact {
+    display: none;
+}
+
+/* For Large Screen than 700px */
+.self-comment.large .comment-box__user .comment-box__interact {
+    display: block;
+    margin-left: auto;
+}
+.self-comment.large .comment-box__interact:nth-of-type(3) {
+    display: none;
+}
 .comment-box__interact--self>span + span {
     margin-left: 1rem;
+}
+
+@media (min-width:700px) {
+    .self-comment.large .comment-box__main {
+        order: 1;
+        flex-basis: 85%;
+    }
 }
 
 .self-comment .delete,
@@ -326,6 +345,14 @@ textarea:focus {
     position: relative;
 }
 
+.add-comment-section form {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
 .add-comment-section form>textarea {
     width: 100%;
     min-height: 100px;
@@ -334,11 +361,25 @@ textarea:focus {
     font-family: inherit;
     padding: 1rem;
     cursor: pointer;
+    margin-bottom: 1rem;
+    flex-basis: 100%;
 }
 
 .add-comment-section form .add-comment__trigger {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 1rem;
+}
+
+@media (min-width:700px) {
+    .add-comment-section form>textarea {
+        flex-basis: 75%;
+    }
+    .add-comment-section form>img {
+        order: -1;
+        align-self: flex-start;
+    }
+    .add-comment-section form .add-comment__trigger {
+        align-self: flex-start;
+    }
 }
