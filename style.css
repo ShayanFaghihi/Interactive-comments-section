@@ -22,7 +22,8 @@
     --ne-white : hsl(0, 0%, 100%);
 
     /* Font */
-    --default-font-size : 1.2rem;
+    --default-font-size : 1rem;
+    --font-size-small : .8rem;
 
     /* Border */
     --default-border-radius : 7px;
@@ -33,7 +34,7 @@ body {
     font-size: 16px;
     font-weight: 400;
     letter-spacing: 1.8;
-    line-height: 1.4;
+    line-height: 1.6;
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -73,7 +74,8 @@ img {
     font-weight: 400;
 }
 
-.btn:focus {
+.btn:focus,
+textarea:focus {
     outline: none;
 }
 
@@ -86,6 +88,7 @@ img {
 .btn-blue:hover {
     background-color: var(--pri-light-gray-blue);
 }
+
 /* ////////////////////////// */
 /* Main Styles */
 /* ////////////////////////// */
@@ -93,7 +96,6 @@ img {
 /* Comments Section */
 /* Comment Box */
 .comment-box {
-    width: 100%;
     background-color: var(--ne-white);
     padding: 1rem;
     border-radius: var(--default-border-radius);
@@ -110,6 +112,11 @@ img {
     align-items: center;
 }
 
+.comment-box__user .user-avatar {
+    display: flex;
+    align-items: center;
+}
+
 .comment-box__user>span + span {
     margin-left: 1rem;
 }
@@ -120,9 +127,62 @@ img {
     color: var(--neu-dark-blue);
 }
 
+
 .comment-box__user .user-comment-date {
-    font-size: var(--default-font-size);
+    font-size: var(--font-size-small);
     color: var(--neu-gray-blue);
+    
+}
+
+/* Add reply comment */
+.add-comment-section.add-reply {
+    margin: 1rem 0 2rem 0;
+}
+
+/* Reply Comment Boxes */
+.comments-section .reply-section {
+    margin-left: 1.5rem;
+    position: relative;
+}
+
+.comments-section .reply-section .comment-box__comment .reply-to {
+    font-weight: 700;
+    color: var(--pri-mod-blue);
+    margin-right: 10px;
+}
+.comments-section .reply-section::before {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    border-radius: var(--default-border-radius);
+    background-color: var(--neu-gray-blue);
+    opacity: .5;
+    top: 0;
+    left: -22px;
+}
+
+/* My Comment */
+/* You Purple Tag */
+.self-comment .comment-box__user .you-tag {
+    background-color: var(--pri-mod-blue);
+    color: var(--ne-white);
+    padding: 0 10px;
+    border-radius: var(--default-border-radius);
+}
+
+.comment-box__interact--self>span + span {
+    margin-left: 1rem;
+}
+
+.self-comment .delete {
+    color: var(--pri-soft-red);
+    cursor: pointer;
+}
+
+.self-comment .edit {
+    color: var(--pri-mod-blue);
+    cursor: pointer;
 }
 
 /* Comment */
@@ -168,7 +228,7 @@ img {
     cursor: pointer;
     font-size: var(--default-font-size);
     color: var(--pri-mod-blue);
-    font-weight: 700;
+    font-weight: 500;
     transition: color .3s ease-out;
 }
 
@@ -183,6 +243,7 @@ img {
     background-color: var(--ne-white);
     border-radius: var(--default-border-radius);
     padding: 1rem;
+    position: relative;
 }
 
 .add-comment-section form>textarea {
