@@ -89,8 +89,8 @@ const addNewComment = (e) => {
                 <span class="user-comment-date">2 Days ago</span>
                 <div class="comment-box__interact">
                 <div class="comment-box__interact--self">
-                    <span class="delete"><i class="fas fa-trash"></i> Delete</span>
-                    <span class="edit"><i class="fas fa-pen"></i> Edit</span>
+                    <span class="delete" onclick="deleteMyComment(this)" title="Delete this comment"><i class="fas fa-trash"></i> Delete</span>
+                    <span class="edit" onclick="editMyComment(this)" title="Edit this comment"><i class="fas fa-pen"></i> Edit</span>
                 </div>
                 </div> <!--End of Interaction-->
             </div> <!--End of user-->
@@ -102,8 +102,8 @@ const addNewComment = (e) => {
 
         <div class="comment-box__interact">
             <div class="comment-box__interact--self">
-                <span class="delete"><i class="fas fa-trash"></i> Delete</span>
-                <span class="edit"><i class="fas fa-pen"></i> Edit</span>
+                <span class="delete" onclick="deleteMyComment(this)" ><i class="fas fa-trash"></i> Delete</span>
+                <span class="edit" onclick="editMyComment(this)"><i class="fas fa-pen"></i> Edit</span>
             </div>
         </div> <!--End of Interaction-->
 
@@ -113,6 +113,20 @@ const addNewComment = (e) => {
     checkBrowserWidth();
     // Clearing textarea after sending the comment
     e.srcElement[0].value = '';
+}
+
+
+// Functions related to written comments by current user
+// Delete my own comment
+const deleteMyComment = e => {
+    // Find the closest div with class of "self-comment"
+    const closestSelfParent = e.closest(".self-comment");
+    closestSelfParent.remove();
+}
+
+// Edit my own comment
+const editMyComment = e => {
+    console.log(e);
 }
 
 // Adding "large" class to comment box when the window size is larger than 700p
