@@ -345,7 +345,8 @@ textarea:focus {
     position: relative;
 }
 
-.add-comment-section form {
+.add-comment-section form,
+.edit-comment-section {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -353,7 +354,8 @@ textarea:focus {
 }
 
 
-.add-comment-section form>textarea {
+.add-comment-section form>textarea,
+.edit-comment-section>textarea {
     width: 100%;
     min-height: 100px;
     border: 1px solid var(--neu-light-grey);
@@ -365,21 +367,24 @@ textarea:focus {
     flex-basis: 100%;
 }
 
-.add-comment-section form .add-comment__trigger {
+.add-comment-section form .add-comment__trigger,
+.edit-comment-section .edit-comment__trigger {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 @media (min-width:700px) {
-    .add-comment-section form>textarea {
+    .add-comment-section form>textarea,
+    .edit-comment-section>textarea {
         flex-basis: 75%;
     }
     .add-comment-section form>img {
         order: -1;
         align-self: flex-start;
     }
-    .add-comment-section form .add-comment__trigger {
+    .add-comment-section form .add-comment__trigger,
+    .edit-comment-section .edit-comment__trigger  {
         align-self: flex-start;
     }
 }
