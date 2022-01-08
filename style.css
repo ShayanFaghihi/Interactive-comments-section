@@ -118,7 +118,7 @@ textarea:focus {
 @media (min-width:700px) {
     .comment-box.large .comment-box__main {
         order: 1;
-        flex-basis: 75%;
+        flex-basis: 71%;
     }
 
     .comment-box.large>div:nth-of-type(1),
@@ -337,7 +337,8 @@ textarea:focus {
 }
 
 /* Add Comment Section */
-.add-comment-section {
+.add-comment-section,
+.add-reply {
     width: 100%;
     background-color: var(--ne-white);
     border-radius: var(--default-border-radius);
@@ -346,7 +347,8 @@ textarea:focus {
 }
 
 .add-comment-section form,
-.edit-comment-section {
+.edit-comment-section,
+.add-reply {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -355,7 +357,8 @@ textarea:focus {
 
 
 .add-comment-section form>textarea,
-.edit-comment-section>textarea {
+.edit-comment-section>textarea,
+.add-reply>textarea {
     width: 100%;
     min-height: 100px;
     border: 1px solid var(--neu-light-grey);
@@ -367,7 +370,7 @@ textarea:focus {
     flex-basis: 100%;
 }
 
-.add-comment-section form .add-comment__trigger,
+.add-comment-section .add-comment__trigger,
 .edit-comment-section .edit-comment__trigger {
     display: flex;
     justify-content: space-between;
@@ -375,15 +378,15 @@ textarea:focus {
 }
 
 @media (min-width:700px) {
-    .add-comment-section form>textarea,
+    .add-comment-section>textarea,
     .edit-comment-section>textarea {
         flex-basis: 75%;
     }
-    .add-comment-section form>img {
+    .add-comment-section>img {
         order: -1;
         align-self: flex-start;
     }
-    .add-comment-section form .add-comment__trigger,
+    .add-comment-section .add-comment__trigger,
     .edit-comment-section .edit-comment__trigger  {
         align-self: flex-start;
     }
