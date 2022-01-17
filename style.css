@@ -279,6 +279,7 @@ textarea:focus {
 
 .comment-box__interact .comment-score span {
     cursor: pointer;
+    user-select: none;
 }
 
 .comment-box__interact .comment-score .like,
