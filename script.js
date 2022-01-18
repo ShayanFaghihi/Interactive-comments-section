@@ -9,12 +9,35 @@ let replyCommentsId = [];
 let commentsArray = [];
 let repliesArray = [];
 
+// Adding "large" class to comment box when the window size is larger than 700p
+const checkBrowserWidth = () => {
+    const commentBoxes = document.querySelectorAll(".comment-box");
+    if(window.innerWidth > 700) {
+        commentBoxes.forEach(commentBox => {
+            commentBox.classList.add("large")
+        });
+    } else {
+        commentBoxes.forEach(commentBox => {
+            commentBox.classList.remove("large")
+        })
+    }
+}
+
+
 // Reading all the data from the data file (in JSON)
 async function readData () {
     const request = await fetch('data.json');
     const data = await request.json();
-    showComments(data.comments);
-    showReplies(data.comments);
+
+    // Send every data came from data.json to global arrays
+    data.comments.forEach(comment => {
+        commentsArray.push(comment);
+        if(comment.replies.length > 0) {
+           comment.replies.forEach(reply => {
+               repliesArray.push(reply)
+           })
+        }
+    })
 
     // Passing current User data
     currentUser = data.currentUser.username;
@@ -29,14 +52,15 @@ async function readData () {
 // Reading data from data file function 
 readData();
 
-
 // Show comments into the DOM
-const showComments = array => {
+ function showComments(array) {
     // Sorting comments array based on the scores (Descending)
-    array.sort((a,b) => {
-       return  parseFloat(a.score) - parseFloat(b.score);
-    })
-    array.forEach(comment => {
+    // array.sort((a,b) => {
+    //    return  parseFloat(a.score) - parseFloat(b.score);
+    // })
+
+     array.forEach(comment => {
+        console.log(comment)
         const {id,content,createdAt,score,user:{image:{png},username}} = comment;
         commentsId.push(id);
         commentsSection.insertAdjacentHTML("afterbegin",`
@@ -70,19 +94,6 @@ const showComments = array => {
         </div> <!--End of Comment Box-->
         `);
 
-         // Push each comments grabbed from data.json to the global array
-         commentsArray.push({
-            "id": id,
-            "content": `${content}`,
-            "createdAt": `${createdAt}`,
-            "score": `${score}`,
-            "user": {
-              "image": { 
-                "png": `${png}`
-              },
-              "username": `${username}`
-            }
-          });
     });
     checkBrowserWidth();
 }
@@ -186,6 +197,9 @@ const showReplies = array => {
         }
     });
 }
+
+showComments(commentsArray)
+showReplies(repliesArray);
 
 // Add a new Comment from the form
 const addNewComment = (e) => {
@@ -320,9 +334,9 @@ const addReply = (e,replyingTo,replyingToId) => {
             <div class="comment-box self-comment" data-reply-id=${id}>
                 <div class="comment-box__interact">
                     <div class="comment-score">
-                        <span class="like">+</span>
+                        <span class="like" onclick="incrementScore(this)">+</span>
                         <span class="score">0</span>
-                        <span class="dislike">-</span>
+                        <span class="dislike" onclick="decrementScore(this)">-</span>
                     </div> <!--End of Scores-->
                 </div> <!--End of Interaction-->
 
@@ -362,9 +376,9 @@ const addReply = (e,replyingTo,replyingToId) => {
                     <div class="comment-box self-comment" data-reply-id=${id}>
                         <div class="comment-box__interact">
                             <div class="comment-score">
-                                <span class="like">+</span>
+                                <span class="like" onclick="incrementScore(this)">+</span>
                                 <span class="score">0</span>
-                                <span class="dislike">-</span>
+                                <span class="dislike" onclick="decrementScore(this)">-</span>
                             </div> <!--End of Scores-->
                         </div> <!--End of Interaction-->
 
@@ -484,39 +498,50 @@ const updateEditedComment = (e,replyingTo,commentedId,replyId) => {
     }
 }
 
-// Adding "large" class to comment box when the window size is larger than 700p
-const checkBrowserWidth = () => {
-    const commentBoxes = document.querySelectorAll(".comment-box");
-    if(window.innerWidth > 700) {
-        commentBoxes.forEach(commentBox => {
-            commentBox.classList.add("large")
-        });
-    } else {
-        commentBoxes.forEach(commentBox => {
-            commentBox.classList.remove("large")
-        })
-    }
-}
-
-
 
 
 // Scoring System
 // Incerment
 const incrementScore = (e) => {
     const scoreContainer = e.nextElementSibling;
+    const commentId = scoreContainer.closest(".comment-box").getAttribute("data-id");
+    const replyId = scoreContainer.closest(".comment-box").getAttribute("data-reply-id");
     let score = e.nextElementSibling.textContent;
+
     score++;
     scoreContainer.innerText = score;
+
+    // Updating the global comments and replies arrays based on the id
+    if(commentId) {
+        // If it is a comment
+        commentsArray.filter(object => object.id == commentId)[0].score = score;
+
+    } else {
+        // If it is a reply
+        repliesArray.filter(object => object.id == replyId)[0].score = score;
+    }
 }
 
 
 // Decrement
 const decrementScore = (e) => {
     const scoreContainer = e.previousElementSibling;
+    const commentId = scoreContainer.closest(".comment-box").getAttribute("data-id");
+    const replyId = scoreContainer.closest(".comment-box").getAttribute("data-reply-id");
     let score = e.previousElementSibling.textContent;
+
     score > 0 ? score-- : score == 0;
     scoreContainer.innerText = score;
+
+    // Updating the global comments and replies arrays based on the id
+    if(commentId) {
+        // If it is a comment
+        commentsArray.filter(object => object.id == commentId)[0].score = score;
+
+    } else {
+        // If it is a reply
+        repliesArray.filter(object => object.id == replyId)[0].score = score;
+    }
 }
 
 
