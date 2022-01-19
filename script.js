@@ -33,8 +33,10 @@ async function readData () {
     data.comments.forEach(comment => {
         commentsArray.push(comment);
         if(comment.replies.length > 0) {
+            const commentId = comment.id;
            comment.replies.forEach(reply => {
-               repliesArray.push(reply)
+               repliesArray.push(reply);
+               reply.parentId = commentId;
            })
         }
     })
@@ -49,18 +51,20 @@ async function readData () {
     });
 }
 
-// Reading data from data file function 
-readData();
+// Passing data to global arrays after reading data from database
+readData().then(() => {
+    showComments(commentsArray);
+    showReplies(repliesArray);
+});
 
 // Show comments into the DOM
  function showComments(array) {
     // Sorting comments array based on the scores (Descending)
-    // array.sort((a,b) => {
-    //    return  parseFloat(a.score) - parseFloat(b.score);
-    // })
+    array.sort((a,b) => {
+       return  parseFloat(a.score) - parseFloat(b.score);
+    })
 
      array.forEach(comment => {
-        console.log(comment)
         const {id,content,createdAt,score,user:{image:{png},username}} = comment;
         commentsId.push(id);
         commentsSection.insertAdjacentHTML("afterbegin",`
@@ -126,80 +130,58 @@ readData();
 
 // Show comments' Replies into the DOM from the data.json to be the future database
 const showReplies = array => {
-    array.forEach(comment => {
-        const commentId = comment.id;
-        const replies = comment.replies;
-        if(replies.length > 0) {
-            const parentComment = document.querySelector(`[data-id='${commentId}']`);
-            // Creating the main reply section - this DIV contains a before psedu class drawing a line before
-            const replySectionContainer = document.createElement("div");
-            replySectionContainer.classList.add("reply-section");
-            parentComment.insertAdjacentElement("afterend",replySectionContainer);
+    // Sorting replies based on the number of the score
+    array.sort((a,b) => {
+        return parseFloat(a.score) - parseFloat(b.score);
+    })
+    array.forEach(reply => {
+        const {id,content,createdAt,score,user:{image:{png},username},replyingTo,parentId} = reply;
+        replyCommentsId.push(id);
+        const parentComment = document.querySelector(`[data-id='${parentId}']`);
+        // Creating the main reply section - this DIV contains a before psedu class drawing a line before
+        const replySectionContainer = document.createElement("div");
+        replySectionContainer.classList.add("reply-section");
+        parentComment.insertAdjacentElement("afterend",replySectionContainer);
 
-            // Deep into each reply
-            replies.sort((a,b) => {
-                return parseFloat(a.score) - parseFloat(b.score);
-            })
-            replies.forEach(reply => {
-                const {id,content,createdAt,score,user:{image:{png},username},replyingTo} = reply;
-                replyCommentsId.push(id);
-                replySectionContainer.insertAdjacentHTML("afterbegin", `
-                    <!-- Replies Comment Box -->                   
-                    <div class="comment-box" data-reply-id=${id}>
-                        <div class="comment-box__interact">
-                        <div class="comment-score">
-                            <span class="like" onclick="incrementScore(this)">+</span>
-                            <span class="score">${score}</span>
-                            <span class="dislike" onclick="decrementScore(this)">-</span>
-                        </div> <!--End of Scores-->
-                        </div> <!--End of Interaction-->
+        replySectionContainer.insertAdjacentHTML("afterbegin", `
+            <!-- Replies Comment Box -->                   
+            <div class="comment-box" data-reply-id=${id}>
+                <div class="comment-box__interact">
+                <div class="comment-score">
+                    <span class="like" onclick="incrementScore(this)">+</span>
+                    <span class="score">${score}</span>
+                    <span class="dislike" onclick="decrementScore(this)">-</span>
+                </div> <!--End of Scores-->
+                </div> <!--End of Interaction-->
+    
+                <div class="comment-box__main">
+                <div class="comment-box__user">
+                    <span class="user-avatar"><img src="${png}" alt="${username}" class="avatar"></span>
+                    <span class="username">${username}</span>
+                    <span class="user-comment-date">${createdAt}</span>
+                </div> <!--End of user-->
+                <div class="comment-box__comment">
+                    <p class="comment"><span class="reply-to">@${replyingTo}</span>${content}</p>
+                </div> <!--End of comment-->
+                </div>
+    
+                <div class="comment-box__interact">
+                <div class="reply" onclick="replyToComment(this)">
+                    <i class="fas fa-reply"></i>
+                    Reply
+                </div> <!--End of Reply-->
+                </div> <!--End of Interaction-->
+    
+            </div> <!--End of Replies Comment Box-->
             
-                        <div class="comment-box__main">
-                        <div class="comment-box__user">
-                            <span class="user-avatar"><img src="${png}" alt="${username}" class="avatar"></span>
-                            <span class="username">${username}</span>
-                            <span class="user-comment-date">${createdAt}</span>
-                        </div> <!--End of user-->
-                        <div class="comment-box__comment">
-                            <p class="comment"><span class="reply-to">@${replyingTo}</span>${content}</p>
-                        </div> <!--End of comment-->
-                        </div>
-            
-                        <div class="comment-box__interact">
-                        <div class="reply" onclick="replyToComment(this)">
-                            <i class="fas fa-reply"></i>
-                            Reply
-                        </div> <!--End of Reply-->
-                        </div> <!--End of Interaction-->
-            
-                    </div> <!--End of Replies Comment Box-->
-                    
-                    </div> <!--End of Replies Section-->
-            
-                `);
-
-                // Push replies into the global replies array
-                repliesArray.push({
-                    "id": id,
-                    "content": `${content}`,
-                    "createdAt": `${createdAt}`,
-                    "score": score,
-                    "replyingTo": `${replyingTo}`,
-                    "parentId" : commentId,
-                    "user": {
-                      "image": { 
-                        "png": `${png}`
-                      },
-                        "username": `${username}`
-                    }
-                })
-            });
-        }
+            </div> <!--End of Replies Section-->
+    
+        `);
+        
+        
     });
+    checkBrowserWidth();
 }
-
-showComments(commentsArray)
-showReplies(repliesArray);
 
 // Add a new Comment from the form
 const addNewComment = (e) => {
