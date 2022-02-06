@@ -60,7 +60,9 @@ img {
     width: 40px;
     height: auto;
 }
-
+@media (min-width:700px) {
+    .avatar {width: 55px;}
+}
 /* Buttons */
 .btn {
     cursor: pointer;
@@ -95,49 +97,22 @@ textarea:focus {
 
 /* Comments Section */
 /* Comment Box */
-.comment-box {
+.comment-box>.comment-box__main {
     background-color: var(--ne-white);
     padding: 1rem;
     border-radius: var(--default-border-radius);
     margin-bottom: 1rem;
     display: flex;
+    flex-direction: column;
     flex-wrap: wrap;
 }
 
 .comment-box__main {
-    order: -1;
     flex-basis: 100%;
     margin-bottom: 1rem;
 }
 
-.comment-box>div:nth-of-type(1),
-.comment-box>div:nth-of-type(3) {
-    flex-basis: 50%;
-}
 
-@media (min-width:700px) {
-    .comment-box.large .comment-box__main {
-        order: 1;
-        flex-basis: 71%;
-    }
-
-    .comment-box.large>div:nth-of-type(1),
-    .comment-box.large>div:nth-of-type(3) {
-        flex-basis: 5%;
-    }
-
-    .comment-box.large>div:nth-of-type(1) {
-        align-self: flex-start;
-    }
-    
-    .comment-box.large>div:nth-of-type(3) {
-        order: 3;
-    }
-}
-.comment-box>div:nth-of-type(3) {
-    display: flex;
-    justify-content: end;
-}
 
 .comment-box__user {
     display: flex;
@@ -175,9 +150,13 @@ textarea:focus {
 }
 
 /* Reply Comment Boxes */
-.comments-section .reply-section {
+.comment-box .reply-section {
     margin-left: 1.5rem;
     position: relative;
+}
+
+.reply-section>.comment-box {
+    margin-bottom: 1rem;
 }
 
 .comments-section .reply-section::before {
@@ -221,53 +200,49 @@ textarea:focus {
     display: none;
 }
 
-/* For Large Screen than 700px */
-.self-comment.large .comment-box__user .comment-box__interact {
-    display: block;
-    margin-left: auto;
-}
-.self-comment.large .comment-box__interact:nth-of-type(3) {
-    display: none;
-}
+
 .comment-box__interact--self>span + span {
     margin-left: 1rem;
 }
 
-@media (min-width:700px) {
-    .self-comment.large .comment-box__main {
-        order: 1;
-        flex-basis: 85%;
-    }
-}
 
-.self-comment .delete,
-.self-comment .edit {
+.delete,
+.edit {
     cursor: pointer;
     transition: .3s color ease-out;
 }
 
-.self-comment .delete {
+.delete {
     color: var(--pri-soft-red);
 }
-.self-comment .delete:hover {
+.delete:hover {
     color: var(--pri-pale-red);
 }
 
-.self-comment .edit {
+.edit {
     color: var(--pri-mod-blue);
 }
 
-.self-comment .edit:hover {
+.edit:hover {
     color: var(--pri-light-gray-blue);
 }
 
 /* Comment */
+.comment-box__comment {
+    margin-bottom: 2rem;
+}
+
 .comment-box__comment .comment {
     font-size: var(--default-font-size);
     color: var(--neu-gray-blue);
 }
 
 /* Interaction */
+.comment-box__interact {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 .comment-box__interact .comment-score {
     background-color: var(--neu-light-grey);
     width: 110px;
@@ -316,26 +291,6 @@ textarea:focus {
     color: var(--pri-light-gray-blue);
 }
 
-/* Comment Box for Large Screen */
-.comment-box.large {
-    display: flex;
-    justify-content: space-between;
-}
-
-.comment-box.large>div:nth-of-type(2) {
-    margin: 0 1rem;
-}
-
-.comment-box.large>div:nth-of-type(3) {
-   align-self: flex-start;
-}
-.comment-box.large .comment-box__interact .comment-score {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 40px;
-}
 
 /* Add Comment Section */
 .add-comment-section,
@@ -347,20 +302,12 @@ textarea:focus {
     position: relative;
 }
 
-.add-comment-section form,
-.edit-comment-section,
-.add-reply {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-}
 
+.edit-comment-section {justify-content: right;}
 
 .add-comment-section form>textarea,
 .edit-comment-section>textarea,
 .add-reply>textarea {
-    width: 100%;
     min-height: 100px;
     border: 1px solid var(--neu-light-grey);
     border-radius: var(--default-border-radius);
@@ -368,27 +315,23 @@ textarea:focus {
     padding: 1rem;
     cursor: pointer;
     margin-bottom: 1rem;
-    flex-basis: 100%;
 }
 
-.add-comment-section .add-comment__trigger,
-.edit-comment-section .edit-comment__trigger {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.edit-comment-section>textarea {
+    width: 100%;
+}
+.add-comment-section form>textarea,
+.add-reply>textarea {
+    width: 80%;
+    margin-left: 5%;
 }
 
-@media (min-width:700px) {
-    .add-comment-section>textarea,
-    .edit-comment-section>textarea {
-        flex-basis: 75%;
-    }
-    .add-comment-section>img {
-        order: -1;
-        align-self: flex-start;
-    }
-    .add-comment-section .add-comment__trigger,
-    .edit-comment-section .edit-comment__trigger  {
-        align-self: flex-start;
-    }
+
+.add-comment-section .avatar,
+.edit-comment-section .avatar {
+    vertical-align: top;
+}
+
+.add-comment-section .add-comment__trigger{
+    text-align: right;
 }

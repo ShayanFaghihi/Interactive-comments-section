@@ -9,20 +9,6 @@ let replyCommentsId = [];
 let commentsArray = [];
 let repliesArray = [];
 
-// Adding "large" class to comment box when the window size is larger than 700p
-const checkBrowserWidth = () => {
-    const commentBoxes = document.querySelectorAll(".comment-box");
-    if(window.innerWidth > 700) {
-        commentBoxes.forEach(commentBox => {
-            commentBox.classList.add("large")
-        });
-    } else {
-        commentBoxes.forEach(commentBox => {
-            commentBox.classList.remove("large")
-        })
-    }
-}
-
 
 // Reading all the data from the data file (in JSON)
 async function readData () {
@@ -69,15 +55,7 @@ readData().then(() => {
         commentsId.push(id);
         commentsSection.insertAdjacentHTML("afterbegin",`
         <!-- Comment Box -->
-        <div class="comment-box" data-id=${id}>
-          <div class="comment-box__interact">
-            <div class="comment-score">
-              <span class="like" onclick="incrementScore(this)">+</span>
-              <span class="score">${score}</span>
-              <span class="dislike" onclick="decrementScore(this)">-</span>
-            </div> <!--End of Scores-->
-          </div> <!--End of Interaction-->
-  
+        <div class="comment-box" data-id=${id}> 
           <div class="comment-box__main">
             <div class="comment-box__user">
               <span class="user-avatar"><img src="${png}" alt="amyrobson" class="avatar"></span>
@@ -87,19 +65,24 @@ readData().then(() => {
             <div class="comment-box__comment">
               <p class="comment">${content}</p>
             </div> <!--End of comment-->
+            <div class="comment-box__interact">
+              <div class="comment-score">
+                <span class="like" onclick="incrementScore(this)">+</span>
+                <span class="score">${score}</span>
+                <span class="dislike" onclick="decrementScore(this)">-</span>
+              </div> <!--End of Scores-->
+              <div class="reply" onclick="replyToComment(${id},'${username}')">
+                <i class="fas fa-reply"></i>
+                Reply
+              </div> <!--End of Reply-->
+            </div> <!--End of Interaction-->
           </div>
   
-          <div class="comment-box__interact">
-            <div class="reply" onclick="replyToComment(this)">
-              <i class="fas fa-reply"></i>
-              Reply
-            </div> <!--End of Reply-->
-          </div> <!--End of Interaction-->
+          <div class="reply-section"></div>
         </div> <!--End of Comment Box-->
         `);
 
     });
-    checkBrowserWidth();
 }
 
 // Checking and exporting replies to their representative parent comment
@@ -137,50 +120,38 @@ const showReplies = array => {
     array.forEach(reply => {
         const {id,content,createdAt,score,user:{image:{png},username},replyingTo,parentId} = reply;
         replyCommentsId.push(id);
-        const parentComment = document.querySelector(`[data-id='${parentId}']`);
-        // Creating the main reply section - this DIV contains a before psedu class drawing a line before
-        const replySectionContainer = document.createElement("div");
-        replySectionContainer.classList.add("reply-section");
-        parentComment.insertAdjacentElement("afterend",replySectionContainer);
-
-        replySectionContainer.insertAdjacentHTML("afterbegin", `
+        const parentComment = document.querySelector(`[data-id='${parentId}'] .reply-section`);
+        parentComment.insertAdjacentHTML("afterbegin", `
             <!-- Replies Comment Box -->                   
-            <div class="comment-box" data-reply-id=${id}>
-                <div class="comment-box__interact">
-                <div class="comment-score">
-                    <span class="like" onclick="incrementScore(this)">+</span>
-                    <span class="score">${score}</span>
-                    <span class="dislike" onclick="decrementScore(this)">-</span>
-                </div> <!--End of Scores-->
-                </div> <!--End of Interaction-->
-    
+            <div class="comment-box" data-reply-id=${id}>  
                 <div class="comment-box__main">
-                <div class="comment-box__user">
-                    <span class="user-avatar"><img src="${png}" alt="${username}" class="avatar"></span>
-                    <span class="username">${username}</span>
-                    <span class="user-comment-date">${createdAt}</span>
-                </div> <!--End of user-->
-                <div class="comment-box__comment">
-                    <p class="comment"><span class="reply-to">@${replyingTo}</span>${content}</p>
-                </div> <!--End of comment-->
+                    <div class="comment-box__user">
+                        <span class="user-avatar"><img src="${png}" alt="${username}" class="avatar"></span>
+                        <span class="username">${username}</span>
+                        <span class="user-comment-date">${createdAt}</span>
+                    </div> <!--End of user-->
+                    <div class="comment-box__comment">
+                        <p class="comment"><span class="reply-to">@${replyingTo}</span>${content}</p>
+                    </div> <!--End of comment-->
+                    <div class="comment-box__interact">
+                        <div class="comment-score">
+                            <span class="like" onclick="incrementScore(this)">+</span>
+                            <span class="score">${score}</span>
+                            <span class="dislike" onclick="decrementScore(this)">-</span>
+                        </div> <!--End of Scores-->
+                        <div class="reply" onclick="replyToComment(${parentId},'${username}',${id})">
+                            <i class="fas fa-reply"></i>
+                            Reply
+                        </div> <!--End of Reply-->
+                    </div> <!--End of Interaction-->
                 </div>
-    
-                <div class="comment-box__interact">
-                <div class="reply" onclick="replyToComment(this)">
-                    <i class="fas fa-reply"></i>
-                    Reply
-                </div> <!--End of Reply-->
-                </div> <!--End of Interaction-->
-    
+
             </div> <!--End of Replies Comment Box-->
-            
-            </div> <!--End of Replies Section-->
-    
+        
         `);
         
         
     });
-    checkBrowserWidth();
 }
 
 // Add a new Comment from the form
@@ -208,43 +179,32 @@ const addNewComment = (e) => {
     });
 
     commentsSection.insertAdjacentHTML('beforeend',`
-    <div class="comment-box self-comment" data-id=${id}>
-        <div class="comment-box__interact">
-            <div class="comment-score">
-                <span class="like" onclick="incrementScore(this)">+</span>
-                <span class="score">0</span>
-                <span class="dislike" onclick="decrementScore(this)">-</span>
-            </div> <!--End of Scores-->
-        </div> <!--End of Interaction-->
-
-        <div class="comment-box__main">
-            <div class="comment-box__user">
-                <!-- My Comment Details -->
-                <span class="user-avatar"><img src="${currentUserAvatar}" alt="${currentUser}" class="avatar"></span>
-                <span class="username">${currentUser}</span>
-                <span class="you-tag">you</span>
-                <span class="user-comment-date">2 Days ago</span>
+        <!--  Comment Box -->                   
+        <div class="comment-box self-comment" data-id=${id}>  
+            <div class="comment-box__main">
+                <div class="comment-box__user">
+                    <span class="user-avatar"><img src="${currentUserAvatar}" alt="${currentUser}" class="avatar"></span>
+                    <span class="username">${currentUser}</span>
+                    <span class="you-tag">You</span>
+                    <span class="user-comment-date">Just Now</span>
+                </div> <!--End of user-->
+                <div class="comment-box__comment">
+                    <p class="comment">${content}</p>
+                </div> <!--End of comment-->
                 <div class="comment-box__interact">
+                    <div class="comment-score">
+                        <span class="like" onclick="incrementScore(this)">+</span>
+                        <span class="score">0</span>
+                        <span class="dislike" onclick="decrementScore(this)">-</span>
+                    </div> <!--End of Scores-->
                     <div class="comment-box__interact--self">
-                        <span class="delete" onclick="deleteMyComment(this)" title="Delete this comment"><i class="fas fa-trash"></i> Delete</span>
-                        <span class="edit" onclick="editMyComment(this)" title="Edit this comment"><i class="fas fa-pen"></i> Edit</span>
+                        <span class="delete" onclick="deleteMyComment(${id},${null})" title="Delete this comment"><i class="fas fa-trash"></i> Delete</span>
+                        <span class="edit" onclick="editMyComment(${id},${null})" title="Edit this comment"><i class="fas fa-pen"></i> Edit</span>
                     </div>
-                    </div> <!--End of Interaction-->
-            </div> <!--End of user-->
-
-            <div class="comment-box__comment">
-                <p class="comment">${content}</p>
-            </div> <!--End of comment-->
-        </div>
-
-        <div class="comment-box__interact">
-            <div class="comment-box__interact--self">
-                <span class="delete" onclick="deleteMyComment(this)" ><i class="fas fa-trash"></i> Delete</span>
-                <span class="edit" onclick="editMyComment(this)"><i class="fas fa-pen"></i> Edit</span>
+                </div> <!--End of Interaction-->
             </div>
-        </div> <!--End of Interaction-->
 
-    </div> <!--End of My Reply Comment Box-->
+        </div> <!--End of Replies Comment Box-->
     `);
 
     checkBrowserWidth();
@@ -254,41 +214,44 @@ const addNewComment = (e) => {
 
 
 // Reply to a comment
-const replyToComment = e => {
-    const replyingTo = e.closest(".comment-box").querySelector(".username").textContent;
-    const replyingToId = e.closest(".comment-box").getAttribute('data-id');
+const replyToComment = (commentId,replyTo,replyId = null) => {
+    const replyBoxContent = `
+    <!-- Add a reply section -->
+    <div class="add-comment-section add-reply">
+        <img src="${currentUserAvatar}" class="avatar">
+        <textarea name="add-comment" id="replyCommentBox" placeholder="Reply to ${replyTo}"></textarea>
+        <div class="add-comment__trigger">
+            <button class="btn btn-blue" onclick="addReply('${replyTo}','${commentId}',${replyId})">Reply</button>
+        </div>
+    </div> <!--End of Add reply Section -->
+    `;
 
-    // Check if other reply box is already open
-    let hasReplyBox = false;
-    if(e.closest(".comment-box").nextElementSibling) {
-        if(e.closest(".comment-box").nextElementSibling.classList.contains("add-reply")) {
-
-            hasReplyBox = true;
-        }
+    if(replyId) {
+        document.querySelector(`[data-reply-id='${replyId}']`).insertAdjacentHTML("beforeend",replyBoxContent)
+    } else {
+        document.querySelector(`[data-id='${commentId}'] .reply-section`).insertAdjacentHTML("afterbegin",replyBoxContent)
     }
-
-    if(!hasReplyBox) {
-        e.closest(".comment-box").insertAdjacentHTML("afterend",`
-            <!-- Add a reply section -->
-            <div class="add-comment-section add-reply">
-                <textarea name="add-comment" id="replyCommentBox" placeholder="Reply to ${replyingTo}"></textarea>
-                <img src="${currentUserAvatar}" class="avatar">
-                <div class="add-comment__trigger">
-                    <button class="btn btn-blue" onclick="addReply(this,'${replyingTo}','${replyingToId}')">Reply</button>
-                </div>
-            </div> <!--End of Add reply Section -->
-        `)
-    } 
+     
 }
 
 
 // Add the replied comment
-const addReply = (e,replyingTo,replyingToId) => {
+const addReply = (replyTo,commentId,replyId) => {
     // calculating the comment ID
     const id = replyCommentsId.length + 1;
     replyCommentsId.push(id);
 
-    const repliedContent = e.closest(".add-reply").querySelector("#replyCommentBox").value;
+    // Main comment box
+    const parentReplyContainer = document.querySelector(`[data-id='${commentId}'] .reply-section`);
+
+    let repliedContent = '';
+
+    // Check if we are replying to a comment or a reply
+    if(replyId == null) {
+        repliedContent = document.querySelector(`[data-id='${commentId}'] .add-reply textarea`).value;
+    } else {
+        repliedContent = document.querySelector(`[data-reply-id='${replyId}'] .add-reply textarea`).value;
+    }
 
     // Push replies into the global replies array
     repliesArray.push({
@@ -296,8 +259,8 @@ const addReply = (e,replyingTo,replyingToId) => {
         "content": `${repliedContent}`,
         "createdAt": `Just Now`,
         "score": 0,
-        "replyingTo": `${replyingTo}`,
-        "parentId" : replyingToId,
+        "replyingTo": `${replyTo}`,
+        "parentId" : commentId,
         "user": {
           "image": { 
             "png": `${currentUserAvatar}`
@@ -308,133 +271,78 @@ const addReply = (e,replyingTo,replyingToId) => {
 
     // Check if the content is not empty
     if(repliedContent) {
-        
-        // Check if there are other replies sent to the comment by searching into the parantReplyContainer 
-        if(e.closest(".add-reply").nextElementSibling.classList.contains("reply-section")) {
-            const parentReplyContainer = e.closest(".add-reply").nextElementSibling;
-            parentReplyContainer.insertAdjacentHTML("beforeend", `
-            <div class="comment-box self-comment" data-reply-id=${id}>
-                <div class="comment-box__interact">
-                    <div class="comment-score">
-                        <span class="like" onclick="incrementScore(this)">+</span>
-                        <span class="score">0</span>
-                        <span class="dislike" onclick="decrementScore(this)">-</span>
-                    </div> <!--End of Scores-->
-                </div> <!--End of Interaction-->
-
+        parentReplyContainer.insertAdjacentHTML("beforeend", `
+            <!-- Replies Comment Box -->                   
+            <div class="comment-box self-comment" data-reply-id=${id}>  
                 <div class="comment-box__main">
                     <div class="comment-box__user">
-                        <!-- My Comment Details -->
                         <span class="user-avatar"><img src="${currentUserAvatar}" alt="${currentUser}" class="avatar"></span>
                         <span class="username">${currentUser}</span>
-                        <span class="you-tag">you</span>
-                        <span class="user-comment-date">2 Days ago</span>
-                        <div class="comment-box__interact">
-                            <div class="comment-box__interact--self">
-                                <span class="delete" onclick="deleteMyComment(this)" title="Delete this comment"><i class="fas fa-trash"></i> Delete</span>
-                                <span class="edit" onclick="editMyComment(this)" title="Edit this comment"><i class="fas fa-pen"></i> Edit</span>
-                            </div>
-                            </div> <!--End of Interaction-->
+                        <span class="user-comment-date">Just Now</span>
                     </div> <!--End of user-->
-
                     <div class="comment-box__comment">
-                        <p class="comment"><span class="reply-to">@${replyingTo}</span>${repliedContent}</p>
+                        <p class="comment"><span class="reply-to">@${replyTo}</span>${repliedContent}</p>
                     </div> <!--End of comment-->
-                </div>
-
-                <div class="comment-box__interact">
-                    <div class="comment-box__interact--self">
-                        <span class="delete" onclick="deleteMyComment(this)" ><i class="fas fa-trash"></i> Delete</span>
-                        <span class="edit" onclick="editMyComment(this)"><i class="fas fa-pen"></i> Edit</span>
-                    </div>
-                </div> <!--End of Interaction-->
-
-            </div> <!--End of My Reply Comment Box-->
-            `);
-        } else {
-            const mainParentContainer = document.querySelector(`.comment-box[data-id='${replyingToId}']`);
-            mainParentContainer.insertAdjacentHTML("afterend", `
-                <div class="reply-section">
-                    <div class="comment-box self-comment" data-reply-id=${id}>
-                        <div class="comment-box__interact">
-                            <div class="comment-score">
-                                <span class="like" onclick="incrementScore(this)">+</span>
-                                <span class="score">0</span>
-                                <span class="dislike" onclick="decrementScore(this)">-</span>
-                            </div> <!--End of Scores-->
-                        </div> <!--End of Interaction-->
-
-                        <div class="comment-box__main">
-                            <div class="comment-box__user">
-                                <!-- My Comment Details -->
-                                <span class="user-avatar"><img src="${currentUserAvatar}" alt="${currentUser}" class="avatar"></span>
-                                <span class="username">${currentUser}</span>
-                                <span class="you-tag">you</span>
-                                <span class="user-comment-date">2 Days ago</span>
-                                <div class="comment-box__interact">
-                                    <div class="comment-box__interact--self">
-                                        <span class="delete" onclick="deleteMyComment(this)" title="Delete this comment"><i class="fas fa-trash"></i> Delete</span>
-                                        <span class="edit" onclick="editMyComment(this)" title="Edit this comment"><i class="fas fa-pen"></i> Edit</span>
-                                    </div>
-                                    </div> <!--End of Interaction-->
-                            </div> <!--End of user-->
-
-                            <div class="comment-box__comment">
-                                <p class="comment"><span class="reply-to">@${replyingTo}</span>${repliedContent}</p>
-                            </div> <!--End of comment-->
+                    <div class="comment-box__interact">
+                        <div class="comment-score">
+                            <span class="like" onclick="incrementScore(this)">+</span>
+                            <span class="score">0</span>
+                            <span class="dislike" onclick="decrementScore(this)">-</span>
+                        </div> <!--End of Scores-->
+                        <div class="comment-box__interact--self">
+                            <span class="delete" onclick="deleteMyComment(${null},${id})" title="Delete this comment"><i class="fas fa-trash"></i> Delete</span>
+                            <span class="edit" onclick="editMyComment(${null},${id})" title="Edit this comment"><i class="fas fa-pen"></i> Edit</span>
                         </div>
-
-                        <div class="comment-box__interact">
-                            <div class="comment-box__interact--self">
-                                <span class="delete" onclick="deleteMyComment(this)" ><i class="fas fa-trash"></i> Delete</span>
-                                <span class="edit" onclick="editMyComment(this)"><i class="fas fa-pen"></i> Edit</span>
-                            </div>
-                        </div> <!--End of Interaction-->
-                    </div> <!--End of My Reply Comment Box-->
+                    </div> <!--End of Interaction-->
                 </div>
-            `);
-        }
-}
+
+            </div> <!--End of Replies Comment Box-->
+        `);   
+    }
 
     // Remove the reply box
-    e.closest(".add-reply").remove();
+    document.querySelector(`[data-id='${commentId}'] .add-reply`).remove();
 
 }
 
 
 // Functions related to written comments by current user
 // Delete my own comment and reply having class of "self-comment"
-const deleteMyComment = e => {
-    // Find the closest div with class of "self-comment"
-    const closestSelfParent = e.closest(".self-comment");
-    const commentId = e.closest(".self-comment").getAttribute("data-id");
-    const replyId = e.closest(".self-comment").getAttribute("data-reply-id");
-
+const deleteMyComment = (commentId,replyId) => {
     // Removing the comment or reply from the global arrays
     // Check if it was a comment
     if(commentId) {
         const found = commentsArray.find(object => object.id == commentId);
         commentsArray.splice(commentsArray.indexOf(found),1);
+        document.querySelector(`[data-id='${commentId}']`).remove();
     } else {
         const found = repliesArray.find(object => object.id == replyId);
         repliesArray.splice(repliesArray.indexOf(found),1);
+        document.querySelector(`[data-reply-id='${replyId}']`).remove();
     }
-    closestSelfParent.remove();
 }
 
 // Edit my own comment
-const editMyComment = e => {
-    // Find the closest div with class of "comment-box__main" and comment text cotentS
-    const commentContentContainer = e.closest(".comment-box").querySelector(".comment-box__comment");
-    const commentedContent = e.closest(".comment-box").querySelector(".comment").lastChild.textContent;
-    const commentedId = e.closest(".comment-box").getAttribute('data-id');
-    const commentedReplyId = e.closest(".comment-box").getAttribute("data-reply-id");
-    
+const editMyComment = (commentId,replyId) => {
+    // Selecting the content box container based on the comment or reply we are editing
+    let commentContentContainer = '';
+    let commentedContent = '';
     let replyingTo = '';
-    if(e.closest(".comment-box").querySelector(".reply-to")) {
 
-        replyingTo = e.closest(".comment-box").querySelector(".reply-to").textContent;
+    if(commentId) {
+         commentContentContainer = document.querySelector(`[data-id='${commentId}'] .comment-box__comment`);
+         commentedContent = document.querySelector(`[data-id='${commentId}'] .comment`).lastChild.textContent;
+         replyingTo = '';
+        //  Remove Edit Button
+        document.querySelector(`[data-id='${commentId}'] .edit`).hidden = true;
+    } else {
+         commentContentContainer = document.querySelector(`[data-reply-id='${replyId}'] .comment-box__comment`);
+         commentedContent = document.querySelector(`[data-reply-id='${replyId}'] .comment`).lastChild.textContent;
+         replyingTo = document.querySelector(`[data-reply-id='${replyId}'] .reply-to`).textContent;
+        //  Remove Edit Button
+        document.querySelector(`[data-reply-id='${replyId}'] .edit`).hidden = true;
     }
+
     // Turning the commented contetnt to a textarea holding content value
     commentContentContainer.innerHTML = '';
     commentContentContainer.insertAdjacentHTML('afterbegin',`
@@ -442,7 +350,7 @@ const editMyComment = e => {
         <div class="edit-comment-section">
             <textarea name="edit-comment" id="editCommentBox">${commentedContent}</textarea>
             <div class="edit-comment__trigger">
-                <button onclick="updateEditedComment(this,'${replyingTo}',${commentedId}, ${commentedReplyId})" class="btn btn-blue">Update</button>
+                <button onclick="updateEditedComment('${replyingTo}',${commentId}, ${replyId})" class="btn btn-blue">Update</button>
             </div>
         </div> <!--End of edit comment Section-->
     `)
@@ -453,17 +361,25 @@ const editMyComment = e => {
 
 
 // Update Edited Comment
-const updateEditedComment = (e,replyingTo,commentedId,replyId) => {
-    const contentToUpdate = e.closest(".edit-comment-section").querySelector("#editCommentBox").value;
-    const commentContainer = e.closest(".comment-box").querySelector(".comment-box__comment");
-
-    // Changing the content in the global comments array
+const updateEditedComment = (replyingTo,commentedId,replyId) => {
+    let contentToUpdate = '';
+    let commentContainer;
     if(commentedId) {
-        // When editing my own comment
+        contentToUpdate = document.querySelector(`[data-id='${commentedId}'] #editCommentBox`).value;
+        commentContainer = document.querySelector(`[data-id='${commentedId}'] .comment-box__comment`)
+        // Changing the content in the global comments array
         commentsArray.filter(object => object.id == commentedId)[0].content = contentToUpdate;
+
+        // Get Back edit button
+        document.querySelector(`[data-id='${commentedId}'] .edit`).hidden = false;
     } else {
-        // when editing my reply
+        contentToUpdate = document.querySelector(`[data-reply-id='${replyId}'] #editCommentBox`).value;
+        commentContainer = document.querySelector(`[data-reply-id='${replyId}'] .comment-box__comment`)
+        // Changing the content in the global replies array
         repliesArray.filter(object => object.id == replyId)[0].content = contentToUpdate;
+
+        // Get Back edit button
+        document.querySelector(`[data-reply-id='${replyId}'] .edit`).hidden = false;
     }
 
     // Clearing the cedit section and add new updated comment
@@ -481,7 +397,6 @@ const updateEditedComment = (e,replyingTo,commentedId,replyId) => {
 }
 
 
-
 // Scoring System
 // Incerment
 const incrementScore = (e) => {
@@ -497,10 +412,10 @@ const incrementScore = (e) => {
     if(commentId) {
         // If it is a comment
         commentsArray.filter(object => object.id == commentId)[0].score = score;
-
     } else {
         // If it is a reply
         repliesArray.filter(object => object.id == replyId)[0].score = score;
+       
     }
 }
 
@@ -530,5 +445,4 @@ const decrementScore = (e) => {
 
 
 // Event Listeners
-window.addEventListener("resize", checkBrowserWidth);
 addNewCommentForm.addEventListener("submit",addNewComment);
