@@ -67,9 +67,9 @@ readData().then(() => {
             </div> <!--End of comment-->
             <div class="comment-box__interact">
               <div class="comment-score">
-                <span class="like" onclick="incrementScore(this)">+</span>
+                <span class="like" onclick="incrementScore(${id},${null})">+</span>
                 <span class="score">${score}</span>
-                <span class="dislike" onclick="decrementScore(this)">-</span>
+                <span class="dislike" onclick="decrementScore(${id},${null})">-</span>
               </div> <!--End of Scores-->
               <div class="reply" onclick="replyToComment(${id},'${username}')">
                 <i class="fas fa-reply"></i>
@@ -135,9 +135,9 @@ const showReplies = array => {
                     </div> <!--End of comment-->
                     <div class="comment-box__interact">
                         <div class="comment-score">
-                            <span class="like" onclick="incrementScore(this)">+</span>
+                            <span class="like" onclick="incrementScore(${null},${id})">+</span>
                             <span class="score">${score}</span>
-                            <span class="dislike" onclick="decrementScore(this)">-</span>
+                            <span class="dislike" onclick="decrementScore(${null},${id})">-</span>
                         </div> <!--End of Scores-->
                         <div class="reply" onclick="replyToComment(${parentId},'${username}',${id})">
                             <i class="fas fa-reply"></i>
@@ -193,7 +193,7 @@ const addNewComment = (e) => {
                 </div> <!--End of comment-->
                 <div class="comment-box__interact">
                     <div class="comment-score">
-                        <span class="like" onclick="incrementScore(this)">+</span>
+                        <span class="like" onclick="incrementScore(${id},${null})">+</span>
                         <span class="score">0</span>
                         <span class="dislike" onclick="decrementScore(this)">-</span>
                     </div> <!--End of Scores-->
@@ -285,9 +285,9 @@ const addReply = (replyTo,commentId,replyId) => {
                     </div> <!--End of comment-->
                     <div class="comment-box__interact">
                         <div class="comment-score">
-                            <span class="like" onclick="incrementScore(this)">+</span>
+                            <span class="like" onclick="incrementScore(${null},${id})">+</span>
                             <span class="score">0</span>
-                            <span class="dislike" onclick="decrementScore(this)">-</span>
+                            <span class="dislike" onclick="decrementScore(${null},${id})">-</span>
                         </div> <!--End of Scores-->
                         <div class="comment-box__interact--self">
                             <span class="delete" onclick="deleteMyComment(${null},${id})" title="Delete this comment"><i class="fas fa-trash"></i> Delete</span>
@@ -399,12 +399,14 @@ const updateEditedComment = (replyingTo,commentedId,replyId) => {
 
 // Scoring System
 // Incerment
-const incrementScore = (e) => {
-    const scoreContainer = e.nextElementSibling;
-    const commentId = scoreContainer.closest(".comment-box").getAttribute("data-id");
-    const replyId = scoreContainer.closest(".comment-box").getAttribute("data-reply-id");
-    let score = e.nextElementSibling.textContent;
-
+const incrementScore = (commentId,replyId) => {
+    let scoreContainer;
+    if(commentId) {
+        scoreContainer = document.querySelector(`[data-id='${commentId}'] .comment-box__main .comment-score .score`);
+    } else {
+        scoreContainer = document.querySelector(`[data-reply-id='${replyId}'] .comment-box__main .comment-score .score`);
+    }
+    let score = scoreContainer.textContent
     score++;
     scoreContainer.innerText = score;
 
@@ -417,15 +419,20 @@ const incrementScore = (e) => {
         repliesArray.filter(object => object.id == replyId)[0].score = score;
        
     }
+
+    resetData();
 }
 
 
 // Decrement
-const decrementScore = (e) => {
-    const scoreContainer = e.previousElementSibling;
-    const commentId = scoreContainer.closest(".comment-box").getAttribute("data-id");
-    const replyId = scoreContainer.closest(".comment-box").getAttribute("data-reply-id");
-    let score = e.previousElementSibling.textContent;
+const decrementScore = (commentId,replyId) => {
+    let scoreContainer;
+    if(commentId) {
+        scoreContainer = document.querySelector(`[data-id='${commentId}'] .comment-box__main .comment-score .score`);
+    } else {
+        scoreContainer = document.querySelector(`[data-reply-id='${replyId}'] .comment-box__main .comment-score .score`);
+    }
+    let score = scoreContainer.textContent;
 
     score > 0 ? score-- : score == 0;
     scoreContainer.innerText = score;
@@ -439,10 +446,17 @@ const decrementScore = (e) => {
         // If it is a reply
         repliesArray.filter(object => object.id == replyId)[0].score = score;
     }
+
+    resetData();
 }
 
 
-
+const resetData = () => {
+    //  Remove all data in the DOM at first
+    document.querySelector(".comments-section").innerHTML = '';
+    showComments(commentsArray);
+    showReplies(repliesArray);
+}
 
 // Event Listeners
 addNewCommentForm.addEventListener("submit",addNewComment);
